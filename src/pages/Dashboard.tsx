@@ -152,23 +152,32 @@ const Dashboard = () => {
   const fetchData = async (userId: string) => {
     setLoading(true);
     try {
-      // Fetch profile
-      const { data: profileData, error: profileError } = await supabase
-        .from("profiles")
-        .select("*")
-        .eq("user_id", userId)
-        .maybeSingle();
+      // Fetch profile (optimized)
+      const profileData = await (async () => {
+        const {
+          data: { user },
+          error: sessionErr,
+        } = await supabase.auth.getUser();
 
-      if (profileError) {
-        console.error("Profile error:", profileError);
-        toast({
-          variant: "destructive",
-          title: "Error",
-          description: "Failed to load profile data",
-        });
-      } else {
-        setProfile(profileData);
-      }
+        if (sessionErr || !user) {
+          throw sessionErr ?? new Error('No user found');
+        }
+
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('full_name, enrollment_number, phone, department, email')
+          .eq('id', user.id)
+          .single();
+
+        if (error) {
+          console.error('Error loading profile:', error.message);
+          throw error;
+        }
+
+        return data;
+      })();
+
+      setProfile(profileData as unknown as Profile);
 
       // Fetch events
       const { data: eventsData, error: eventsError } = await supabase
