@@ -96,3 +96,60 @@ All colors MUST be HSL.
     @apply bg-background text-foreground;
   }
 }
+
+:root{
+  --card-max:36rem;           /* max width for center panels */
+  --pad-sm:1rem;              /* mobile padding */
+  --pad-md:1.5rem;            /* tablet */
+  --pad-lg:2rem;              /* desktop */
+}
+
+/* Base: consistent sizing & mobile text handling */
+*,*::before,*::after{ box-sizing:border-box; }
+html,body{ height:100%; -webkit-text-size-adjust:100%; text-size-adjust:100%; }
+body{ margin:0; }
+
+/* Full height that behaves with mobile address bars */
+.page-min{ min-height:100dvh; }
+
+/* Safe areas for notches/home indicators */
+.safe-pads{ padding-top:env(safe-area-inset-top); padding-bottom:env(safe-area-inset-bottom); }
+
+/* Media that never distorts */
+img,svg,canvas,video{ max-width:100%; height:auto; display:block; }
+
+/* Background that covers without stretching */
+.bg-cover-center{ background: center/cover no-repeat; }
+
+/* Adaptive center card shell (no JS, no logic changes) */
+.card-shell{
+  width:100%; max-width:var(--card-max);
+  background:rgba(255,255,255,.95);
+  border-radius:1.25rem;
+  box-shadow:0 20px 60px rgba(0,0,0,.18);
+  padding:var(--pad-sm);
+}
+@media (min-width:640px){ .card-shell{ padding:var(--pad-md); } }
+@media (min-width:768px){ .card-shell{ padding:var(--pad-lg); } }
+
+/* Larger tap targets + prevent iOS zoom-on-focus */
+.input-md,.btn-md{ font-size:16px; line-height:1.25rem; padding:.75rem .9rem; border-radius:.6rem; }
+
+/* OTP inputs look consistent */
+.otp-input{ font-variant-numeric:tabular-nums; letter-spacing:.06em; }
+
+/* Disable hover-only animations on touch devices to avoid flicker */
+@media (hover:none){
+  .touch-no-hover{ filter:none !important; transform:none !important; }
+}
+
+/* Respect reduced-motion for accessibility (prevents janky transitions) */
+@media (prefers-reduced-motion:reduce){
+  *{ animation-duration:.01ms !important; animation-iteration-count:1 !important; transition-duration:.01ms !important; scroll-behavior:auto !important; }
+}
+
+/* Utility: page scroll behavior (helps with mobile keyboards) */
+.page-scroll{ overscroll-behavior-y:contain; }
+
+/* Optional polish */
+a,button{ -webkit-tap-highlight-color:transparent; }

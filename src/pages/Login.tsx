@@ -85,11 +85,13 @@ const Login = () => {
                   <Input
                     id="username"
                     type="text"
+                    inputMode="email"
+                    autoComplete="email"
                     placeholder="Username"
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
                     required
-                    className="flex-1"
+                    className="flex-1 text-[16px]"
                   />
                   {!username.includes("@") && (
                     <span className="text-sm text-gray-600 whitespace-nowrap">@muj.manipal.edu</span>

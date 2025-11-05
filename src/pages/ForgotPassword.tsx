@@ -56,12 +56,14 @@ const ForgotPassword = () => {
                   <Input
                     id="email"
                     name="email"
-                    type="email"
+                    type="text"
+                    inputMode="email"
+                    autoComplete="email"
                     placeholder="Email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
-                    className="flex-1"
+                    className="flex-1 text-[16px]"
                   />
                   {!email.includes("@") && (
                     <span className="text-sm text-gray-600 whitespace-nowrap">@muj.manipal.edu</span>
