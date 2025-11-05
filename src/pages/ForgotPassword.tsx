@@ -1,124 +1,91 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { useToast } from "@/hooks/use-toast";
-import mujLogo from "@/assets/muj-logo.png";
+import { ArrowRight } from "lucide-react";
+import MUJWordmark from "@/components/MUJWordmark";
 
 const ForgotPassword = () => {
   const [email, setEmail] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-  const [isSuccess, setIsSuccess] = useState(false);
-  const { toast } = useToast();
+  const [hover, setHover] = useState(false);
+  const navigate = useNavigate();
 
-  const handleResetPassword = async (e: React.FormEvent) => {
+  const buildEmail = (v: string) => {
+    const raw = v.trim().toLowerCase();
+    return raw.includes("@") ? raw : `${raw}@muj.manipal.edu`;
+  };
+
+  const handleResetPassword = (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
-
-    try {
-      const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/reset-password`,
-      });
-
-      if (error) {
-        toast({
-          variant: "destructive",
-          title: "Reset Failed",
-          description: error.message,
-        });
-      } else {
-        setIsSuccess(true);
-        toast({
-          title: "Success",
-          description: "Password reset email sent! Check your inbox",
-        });
-      }
-    } catch (error) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "An unexpected error occurred",
-      });
-    } finally {
-      setIsLoading(false);
-    }
+    const fullEmail = buildEmail(email);
+    navigate(`/auth/otp-reset?email=${encodeURIComponent(fullEmail)}`);
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center">
-      <div className="w-full max-w-md bg-background flex flex-col items-center justify-center p-8">
-        <div className="w-full max-w-md space-y-8">
-          {/* Logo */}
-          <div className="text-center">
-            <img
-              src={mujLogo}
-              alt="Manipal University Jaipur"
-              className="h-24 mx-auto mb-2"
-            />
-            <p className="text-sm text-muted-foreground font-semibold tracking-wider">
-              INSPIRED BY LIFE
-            </p>
-          </div>
+    <div className="relative min-h-screen overflow-hidden">
+      <div
+        className={`absolute inset-0 transition-[filter,transform] duration-300 ${hover ? "blur-sm scale-[1.01]" : ""}`}
+        style={{
+          backgroundImage: "url('https://images.careerindia.com/college-photos/21677/muj-campus_1463046011.jpg')",
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          backgroundRepeat: "no-repeat"
+        }}
+        aria-hidden
+      />
+      <div
+        onMouseEnter={() => setHover(true)}
+        onMouseLeave={() => setHover(false)}
+        className="relative z-10 flex items-center justify-center min-h-screen px-4"
+      >
+        <div className="w-full max-w-[520px] rounded-2xl bg-white/95 shadow-2xl transition-transform duration-300 hover:scale-[1.02] hover:-translate-y-1 p-8">
+          <div className="space-y-6">
+            {/* Logo Section */}
+            <MUJWordmark />
 
-          {/* Heading */}
-          <div className="text-center space-y-2">
-            <h1 className="text-2xl font-bold tracking-tight">
-              Reset Password
-            </h1>
-            <p className="text-sm text-muted-foreground">
-              Enter your email to receive a password reset link
-            </p>
-          </div>
+            {/* Heading */}
+            <div className="text-center space-y-2 pt-4">
+              <p className="text-sm text-gray-600 uppercase tracking-wider">RESET PASSWORD</p>
+              <h2 className="text-2xl font-semibold text-[#d97706]">Forgot Password</h2>
+            </div>
 
-          {/* Form */}
-          {!isSuccess ? (
-            <form onSubmit={handleResetPassword} className="space-y-6">
+            {/* Form */}
+            <form onSubmit={handleResetPassword} className="space-y-6 pt-2">
               <div className="space-y-2">
-                <Label htmlFor="email">Email Address</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="username@muj.manipal.edu"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                  className="w-full"
-                />
+                <div className="flex items-center gap-2">
+                  <Input
+                    id="email"
+                    name="email"
+                    type="email"
+                    placeholder="Email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                    className="flex-1"
+                  />
+                  {!email.includes("@") && (
+                    <span className="text-sm text-gray-600 whitespace-nowrap">@muj.manipal.edu</span>
+                  )}
+                </div>
               </div>
 
               <Button
                 type="submit"
-                className="w-full bg-primary hover:bg-primary/90"
-                disabled={isLoading}
+                className="w-full bg-[#d97706] hover:bg-[#b45309] text-white font-medium"
               >
-                {isLoading ? "Sending..." : "Send Reset Link"}
+                Continue to OTP Reset <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
 
-              <div className="text-center">
+              <div className="text-left pt-2">
                 <Link
                   to="/login"
-                  className="text-sm text-primary hover:underline"
+                  className="text-sm text-gray-600 hover:text-gray-800 hover:underline"
                 >
                   Back to Login
                 </Link>
               </div>
             </form>
-          ) : (
-            <div className="space-y-6">
-              <div className="text-center space-y-2">
-                <p className="text-sm text-muted-foreground">
-                  Check your inbox for the password reset link
-                </p>
-              </div>
-              <Link to="/login">
-                <Button className="w-full bg-primary hover:bg-primary/90">
-                  Back to Login
-                </Button>
-              </Link>
-            </div>
-          )}
+          </div>
         </div>
       </div>
     </div>
