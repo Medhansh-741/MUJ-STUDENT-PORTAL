@@ -1,18 +1,19 @@
 import { defineConfig } from "vite";
-import react from "@vitejs/plugin-react-swc";
-import path from "path";
-import { componentTagger } from "lovable-tagger";
+import react from "@vitejs/plugin-react";
+import { fileURLToPath, URL } from "node:url";
 
-// https://vitejs.dev/config/
-export default defineConfig(({ mode }) => ({
-  server: {
-    host: "0.0.0.0",
-    port: 5000,
-  },
-  plugins: [react(), mode === "development" && componentTagger()].filter(Boolean),
+export default defineConfig({
+  plugins: [react()],
   resolve: {
     alias: {
-      "@": path.resolve(__dirname, "./src"),
+      "@": fileURLToPath(new URL("./src", import.meta.url)), // supports "@/..."
     },
   },
-}));
+  server: {
+    host: true,
+    port: 5173,
+    strictPort: true,
+    allowedHosts: true, // accept Replit hosts
+    hmr: { protocol: "wss", clientPort: 443 },
+  },
+});
